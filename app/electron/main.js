@@ -657,7 +657,7 @@ ipcMain.handle(
       return { success: false, error: error.message };
     }
   }
-});
+);
 
 // ============================================================================
 // Claude CLI Detection IPC Handlers
