@@ -393,10 +393,10 @@ export const KanbanCard = memo(function KanbanCard({
                 !isDescriptionExpanded && "line-clamp-3"
               )}
             >
-              {feature.description || feature.summary || feature.title || feature.id}
+              {feature.description || feature.summary || feature.id}
             </CardTitle>
             {/* Show More/Less toggle - only show when description is likely truncated */}
-            {(feature.description || feature.summary || feature.title || "").length > 100 && (
+            {(feature.description || feature.summary || "").length > 100 && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -844,9 +844,9 @@ export const KanbanCard = memo(function KanbanCard({
               <Sparkles className="w-5 h-5 text-green-400" />
               Implementation Summary
             </DialogTitle>
-            <DialogDescription className="text-sm" title={feature.description || feature.summary || feature.title || ""}>
+            <DialogDescription className="text-sm" title={feature.description || feature.summary || ""}>
               {(() => {
-                const displayText = feature.description || feature.summary || feature.title || "No description";
+                const displayText = feature.description || feature.summary || "No description";
                 return displayText.length > 100
                   ? `${displayText.slice(0, 100)}...`
                   : displayText;
