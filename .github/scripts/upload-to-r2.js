@@ -5,6 +5,8 @@ const {
 } = require("@aws-sdk/client-s3");
 const fs = require("fs");
 const path = require("path");
+const https = require("https");
+const { pipeline } = require("stream/promises");
 
 const s3Client = new S3Client({
   region: "auto",
@@ -18,6 +20,7 @@ const s3Client = new S3Client({
 const BUCKET = process.env.R2_BUCKET_NAME;
 const PUBLIC_URL = process.env.R2_PUBLIC_URL;
 const VERSION = process.env.RELEASE_VERSION;
+const RELEASE_TAG = process.env.RELEASE_TAG || `v${VERSION}`;
 const GITHUB_REPO = process.env.GITHUB_REPOSITORY;
 
 async function fetchExistingReleases() {
@@ -62,8 +65,60 @@ function findArtifacts(dir, pattern) {
   return files.filter((f) => pattern.test(f)).map((f) => path.join(dir, f));
 }
 
+async function downloadFromGitHub(url, outputPath) {
+  return new Promise((resolve, reject) => {
+    https
+      .get(url, (response) => {
+        if (response.statusCode === 302 || response.statusCode === 301) {
+          // Follow redirect
+          return downloadFromGitHub(response.headers.location, outputPath)
+            .then(resolve)
+            .catch(reject);
+        }
+        if (response.statusCode !== 200) {
+          reject(
+            new Error(
+              `Failed to download ${url}: ${response.statusCode} ${response.statusMessage}`
+            )
+          );
+          return;
+        }
+        const fileStream = fs.createWriteStream(outputPath);
+        response.pipe(fileStream);
+        fileStream.on("finish", () => {
+          fileStream.close();
+          resolve();
+        });
+        fileStream.on("error", reject);
+      })
+      .on("error", reject);
+  });
+}
+
 async function main() {
   const artifactsDir = "artifacts";
+  const tempDir = path.join(artifactsDir, "temp");
+
+  // Create temp directory for downloaded GitHub archives
+  if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir, { recursive: true });
+  }
+
+  // Download source archives from GitHub
+  const githubZipUrl = `https://github.com/${GITHUB_REPO}/archive/refs/tags/${RELEASE_TAG}.zip`;
+  const githubTarGzUrl = `https://github.com/${GITHUB_REPO}/archive/refs/tags/${RELEASE_TAG}.tar.gz`;
+
+  const sourceZipPath = path.join(tempDir, `automaker-${VERSION}.zip`);
+  const sourceTarGzPath = path.join(tempDir, `automaker-${VERSION}.tar.gz`);
+
+  console.log(`Downloading source archives from GitHub...`);
+  console.log(`  ZIP: ${githubZipUrl}`);
+  console.log(`  TAR.GZ: ${githubTarGzUrl}`);
+
+  await downloadFromGitHub(githubZipUrl, sourceZipPath);
+  await downloadFromGitHub(githubTarGzUrl, sourceTarGzPath);
+
+  console.log(`Downloaded source archives successfully`);
 
   // Find all artifacts
   const artifacts = {
@@ -77,6 +132,8 @@ async function main() {
       path.join(artifactsDir, "linux-builds"),
       /\.AppImage$/
     ),
+    sourceZip: [sourceZipPath],
+    sourceTarGz: [sourceTarGzPath],
   };
 
   console.log("Found artifacts:");
@@ -97,6 +154,8 @@ async function main() {
     macos: "application/x-apple-diskimage",
     macosArm: "application/x-apple-diskimage",
     linux: "application/x-executable",
+    sourceZip: "application/zip",
+    sourceTarGz: "application/gzip",
   };
 
   for (const [platform, files] of Object.entries(artifacts)) {
@@ -115,7 +174,12 @@ async function main() {
       url: `${PUBLIC_URL}/releases/${VERSION}/${filename}`,
       filename,
       size,
-      arch: platform === "macosArm" ? "arm64" : "x64",
+      arch:
+        platform === "macosArm"
+          ? "arm64"
+          : platform === "sourceZip" || platform === "sourceTarGz"
+          ? "source"
+          : "x64",
     };
   }
 
@@ -126,7 +190,7 @@ async function main() {
     version: VERSION,
     date: new Date().toISOString(),
     assets,
-    githubReleaseUrl: `https://github.com/${GITHUB_REPO}/releases/tag/${VERSION}`,
+    githubReleaseUrl: `https://github.com/${GITHUB_REPO}/releases/tag/${RELEASE_TAG}`,
   };
 
   // Remove existing entry for this version if re-running
