@@ -558,6 +558,18 @@ export class HttpApiClient implements ElectronAPI {
       this.post("/api/worktree/status", { projectPath, featureId }),
     list: (projectPath: string) =>
       this.post("/api/worktree/list", { projectPath }),
+    listAll: (projectPath: string, includeDetails?: boolean) =>
+      this.post("/api/worktree/list", { projectPath, includeDetails }),
+    create: (projectPath: string, branchName: string, baseBranch?: string) =>
+      this.post("/api/worktree/create", { projectPath, branchName, baseBranch }),
+    delete: (projectPath: string, worktreePath: string, deleteBranch?: boolean) =>
+      this.post("/api/worktree/delete", { projectPath, worktreePath, deleteBranch }),
+    commit: (worktreePath: string, message: string) =>
+      this.post("/api/worktree/commit", { worktreePath, message }),
+    push: (worktreePath: string, force?: boolean) =>
+      this.post("/api/worktree/push", { worktreePath, force }),
+    createPR: (worktreePath: string, options?: any) =>
+      this.post("/api/worktree/create-pr", { worktreePath, ...options }),
     getDiffs: (projectPath: string, featureId: string) =>
       this.post("/api/worktree/diffs", { projectPath, featureId }),
     getFileDiff: (projectPath: string, featureId: string, filePath: string) =>
@@ -566,6 +578,14 @@ export class HttpApiClient implements ElectronAPI {
         featureId,
         filePath,
       }),
+    pull: (worktreePath: string) =>
+      this.post("/api/worktree/pull", { worktreePath }),
+    checkoutBranch: (worktreePath: string, branchName: string) =>
+      this.post("/api/worktree/checkout-branch", { worktreePath, branchName }),
+    listBranches: (worktreePath: string) =>
+      this.post("/api/worktree/list-branches", { worktreePath }),
+    switchBranch: (worktreePath: string, branchName: string) =>
+      this.post("/api/worktree/switch-branch", { worktreePath, branchName }),
   };
 
   // Git API

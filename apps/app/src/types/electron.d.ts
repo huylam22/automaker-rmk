@@ -620,6 +620,103 @@ export interface WorktreeAPI {
     error?: string;
   }>;
 
+  // List all worktrees with details (for worktree selector)
+  listAll: (
+    projectPath: string,
+    includeDetails?: boolean
+  ) => Promise<{
+    success: boolean;
+    worktrees?: Array<{
+      path: string;
+      branch: string;
+      isMain: boolean;
+      hasChanges?: boolean;
+      changedFilesCount?: number;
+    }>;
+    error?: string;
+  }>;
+
+  // Create a new worktree
+  create: (
+    projectPath: string,
+    branchName: string,
+    baseBranch?: string
+  ) => Promise<{
+    success: boolean;
+    worktree?: {
+      path: string;
+      branch: string;
+      isNew: boolean;
+    };
+    error?: string;
+  }>;
+
+  // Delete a worktree
+  delete: (
+    projectPath: string,
+    worktreePath: string,
+    deleteBranch?: boolean
+  ) => Promise<{
+    success: boolean;
+    deleted?: {
+      worktreePath: string;
+      branch: string | null;
+    };
+    error?: string;
+  }>;
+
+  // Commit changes in a worktree
+  commit: (
+    worktreePath: string,
+    message: string
+  ) => Promise<{
+    success: boolean;
+    result?: {
+      committed: boolean;
+      commitHash?: string;
+      branch?: string;
+      message?: string;
+    };
+    error?: string;
+  }>;
+
+  // Push a worktree branch to remote
+  push: (
+    worktreePath: string,
+    force?: boolean
+  ) => Promise<{
+    success: boolean;
+    result?: {
+      branch: string;
+      pushed: boolean;
+    };
+    error?: string;
+  }>;
+
+  // Create a pull request from a worktree
+  createPR: (
+    worktreePath: string,
+    options?: {
+      commitMessage?: string;
+      prTitle?: string;
+      prBody?: string;
+      baseBranch?: string;
+      draft?: boolean;
+    }
+  ) => Promise<{
+    success: boolean;
+    result?: {
+      branch: string;
+      committed: boolean;
+      commitHash?: string;
+      pushed: boolean;
+      prUrl?: string;
+      prCreated: boolean;
+      prError?: string;
+    };
+    error?: string;
+  }>;
+
   // Get file diffs for a feature worktree
   getDiffs: (
     projectPath: string,
@@ -632,6 +729,59 @@ export interface WorktreeAPI {
     featureId: string,
     filePath: string
   ) => Promise<FileDiffResult>;
+
+  // Pull latest changes from remote
+  pull: (worktreePath: string) => Promise<{
+    success: boolean;
+    result?: {
+      branch: string;
+      pulled: boolean;
+      message: string;
+    };
+    error?: string;
+  }>;
+
+  // Create and checkout a new branch
+  checkoutBranch: (
+    worktreePath: string,
+    branchName: string
+  ) => Promise<{
+    success: boolean;
+    result?: {
+      previousBranch: string;
+      newBranch: string;
+      message: string;
+    };
+    error?: string;
+  }>;
+
+  // List all local branches
+  listBranches: (worktreePath: string) => Promise<{
+    success: boolean;
+    result?: {
+      currentBranch: string;
+      branches: Array<{
+        name: string;
+        isCurrent: boolean;
+        isRemote: boolean;
+      }>;
+    };
+    error?: string;
+  }>;
+
+  // Switch to an existing branch
+  switchBranch: (
+    worktreePath: string,
+    branchName: string
+  ) => Promise<{
+    success: boolean;
+    result?: {
+      previousBranch: string;
+      currentBranch: string;
+      message: string;
+    };
+    error?: string;
+  }>;
 }
 
 export interface GitAPI {

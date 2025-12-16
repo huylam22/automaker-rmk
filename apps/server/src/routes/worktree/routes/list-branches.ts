@@ -1,0 +1,68 @@
+/**
+ * POST /list-branches endpoint - List all local branches
+ */
+
+import type { Request, Response } from "express";
+import { exec } from "child_process";
+import { promisify } from "util";
+import { getErrorMessage, logError } from "../common.js";
+
+const execAsync = promisify(exec);
+
+interface BranchInfo {
+  name: string;
+  isCurrent: boolean;
+  isRemote: boolean;
+}
+
+export function createListBranchesHandler() {
+  return async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { worktreePath } = req.body as {
+        worktreePath: string;
+      };
+
+      if (!worktreePath) {
+        res.status(400).json({
+          success: false,
+          error: "worktreePath required",
+        });
+        return;
+      }
+
+      // Get current branch
+      const { stdout: currentBranchOutput } = await execAsync(
+        "git rev-parse --abbrev-ref HEAD",
+        { cwd: worktreePath }
+      );
+      const currentBranch = currentBranchOutput.trim();
+
+      // List all local branches
+      const { stdout: branchesOutput } = await execAsync(
+        "git branch --format='%(refname:short)'",
+        { cwd: worktreePath }
+      );
+
+      const branches: BranchInfo[] = branchesOutput
+        .trim()
+        .split("\n")
+        .filter((b) => b.trim())
+        .map((name) => ({
+          name: name.trim(),
+          isCurrent: name.trim() === currentBranch,
+          isRemote: false,
+        }));
+
+      res.json({
+        success: true,
+        result: {
+          currentBranch,
+          branches,
+        },
+      });
+    } catch (error) {
+      logError(error, "List branches failed");
+      res.status(500).json({ success: false, error: getErrorMessage(error) });
+    }
+  };
+}

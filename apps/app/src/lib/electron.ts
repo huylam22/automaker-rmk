@@ -1050,6 +1050,78 @@ function createMockWorktreeAPI(): WorktreeAPI {
       return { success: true, worktrees: [] };
     },
 
+    listAll: async (projectPath: string, includeDetails?: boolean) => {
+      console.log("[Mock] Listing all worktrees:", { projectPath, includeDetails });
+      return {
+        success: true,
+        worktrees: [
+          { path: projectPath, branch: "main", isMain: true, hasChanges: false, changedFilesCount: 0 },
+        ],
+      };
+    },
+
+    create: async (projectPath: string, branchName: string, baseBranch?: string) => {
+      console.log("[Mock] Creating worktree:", { projectPath, branchName, baseBranch });
+      return {
+        success: true,
+        worktree: {
+          path: `${projectPath}/.worktrees/${branchName}`,
+          branch: branchName,
+          isNew: true,
+        },
+      };
+    },
+
+    delete: async (projectPath: string, worktreePath: string, deleteBranch?: boolean) => {
+      console.log("[Mock] Deleting worktree:", { projectPath, worktreePath, deleteBranch });
+      return {
+        success: true,
+        deleted: {
+          worktreePath,
+          branch: deleteBranch ? "feature-branch" : null,
+        },
+      };
+    },
+
+    commit: async (worktreePath: string, message: string) => {
+      console.log("[Mock] Committing changes:", { worktreePath, message });
+      return {
+        success: true,
+        result: {
+          committed: true,
+          commitHash: "abc123",
+          branch: "feature-branch",
+          message,
+        },
+      };
+    },
+
+    push: async (worktreePath: string, force?: boolean) => {
+      console.log("[Mock] Pushing worktree:", { worktreePath, force });
+      return {
+        success: true,
+        result: {
+          branch: "feature-branch",
+          pushed: true,
+        },
+      };
+    },
+
+    createPR: async (worktreePath: string, options?: any) => {
+      console.log("[Mock] Creating PR:", { worktreePath, options });
+      return {
+        success: true,
+        result: {
+          branch: "feature-branch",
+          committed: true,
+          commitHash: "abc123",
+          pushed: true,
+          prUrl: "https://github.com/example/repo/pull/1",
+          prCreated: true,
+        },
+      };
+    },
+
     getDiffs: async (projectPath: string, featureId: string) => {
       console.log("[Mock] Getting file diffs:", { projectPath, featureId });
       return {
@@ -1077,6 +1149,57 @@ function createMockWorktreeAPI(): WorktreeAPI {
         success: true,
         diff: `diff --git a/${filePath} b/${filePath}\n+++ new file\n@@ -0,0 +1,5 @@\n+// New content`,
         filePath,
+      };
+    },
+
+    pull: async (worktreePath: string) => {
+      console.log("[Mock] Pulling latest changes for:", worktreePath);
+      return {
+        success: true,
+        result: {
+          branch: "main",
+          pulled: true,
+          message: "Pulled latest changes",
+        },
+      };
+    },
+
+    checkoutBranch: async (worktreePath: string, branchName: string) => {
+      console.log("[Mock] Creating and checking out branch:", { worktreePath, branchName });
+      return {
+        success: true,
+        result: {
+          previousBranch: "main",
+          newBranch: branchName,
+          message: `Created and checked out branch '${branchName}'`,
+        },
+      };
+    },
+
+    listBranches: async (worktreePath: string) => {
+      console.log("[Mock] Listing branches for:", worktreePath);
+      return {
+        success: true,
+        result: {
+          currentBranch: "main",
+          branches: [
+            { name: "main", isCurrent: true, isRemote: false },
+            { name: "develop", isCurrent: false, isRemote: false },
+            { name: "feature/example", isCurrent: false, isRemote: false },
+          ],
+        },
+      };
+    },
+
+    switchBranch: async (worktreePath: string, branchName: string) => {
+      console.log("[Mock] Switching to branch:", { worktreePath, branchName });
+      return {
+        success: true,
+        result: {
+          previousBranch: "main",
+          currentBranch: branchName,
+          message: `Switched to branch '${branchName}'`,
+        },
       };
     },
   };
