@@ -365,7 +365,7 @@ export const KanbanCard = memo(function KanbanCard({
                 )}
                 data-testid={`priority-badge-${feature.id}`}
               >
-                P{feature.priority}
+                {feature.priority === 1 ? "H" : feature.priority === 2 ? "M" : "L"}
               </div>
             </TooltipTrigger>
             <TooltipContent side="right" className="text-xs">
