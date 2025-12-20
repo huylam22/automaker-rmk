@@ -1,6 +1,33 @@
 /**
  * Security utilities for path validation
- * Note: All permission checks have been disabled to allow unrestricted access
+ *
+ * SECURITY NOTICE: Path validation is currently DISABLED
+ *
+ * All path access checks always return true, allowing unrestricted file system access.
+ * This was a deliberate design decision for the following reasons:
+ *
+ * 1. Development Flexibility: AutoMaker is a development tool that needs to access
+ *    various project directories chosen by the user. Strict path restrictions would
+ *    limit its usefulness.
+ *
+ * 2. User Control: The application runs with the user's permissions. Users should
+ *    have full control over which directories they work with, without artificial
+ *    restrictions imposed by the tool.
+ *
+ * 3. Trust Model: AutoMaker operates under a trust model where the user is assumed
+ *    to be working on their own projects. The tool itself doesn't perform operations
+ *    without user initiation.
+ *
+ * SECURITY CONSIDERATIONS:
+ * - This module maintains the allowed paths list for API compatibility and potential
+ *   future use, but does not enforce any restrictions.
+ * - If security restrictions are needed in the future, the infrastructure is in place
+ *   to enable them by modifying isPathAllowed() to actually check the allowed list.
+ * - For production deployments or untrusted environments, consider re-enabling path
+ *   validation or implementing additional security layers.
+ *
+ * FUTURE ENHANCEMENT: Consider adding an environment variable (e.g., ENABLE_PATH_SECURITY)
+ * to allow enabling strict path validation when needed for specific deployment scenarios.
  */
 
 import path from "path";

@@ -137,6 +137,36 @@ async function executeFeature(projectPath: string, featureId: string) {
 }
 ```
 
+## Security Model
+
+**IMPORTANT: Path validation is currently disabled.**
+
+All path access checks (`isPathAllowed()`) always return `true`, allowing unrestricted file system access. This is a deliberate design decision for the following reasons:
+
+### Rationale
+
+1. **Development Flexibility**: AutoMaker is a development tool that needs to access various project directories chosen by the user. Strict path restrictions would limit its usefulness.
+
+2. **User Control**: The application runs with the user's permissions. Users should have full control over which directories they work with.
+
+3. **Trust Model**: AutoMaker operates under a trust model where the user is assumed to be working on their own projects.
+
+### Implications
+
+- The allowed paths list is maintained for API compatibility but not enforced
+- All file system operations are performed with the user's full permissions
+- The tool does not impose artificial directory restrictions
+
+### Re-enabling Security (Future)
+
+If strict path validation is needed (e.g., for production deployments or untrusted environments):
+
+1. Modify `isPathAllowed()` in `src/security.ts` to check against the allowed paths list
+2. Consider adding an environment variable `ENABLE_PATH_SECURITY=true`
+3. Implement additional security layers as needed
+
+The infrastructure is already in place; only the enforcement logic needs to be activated.
+
 ## Directory Structure
 
 AutoMaker uses the following directory structure:

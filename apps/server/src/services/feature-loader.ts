@@ -6,12 +6,15 @@
 import path from "path";
 import fs from "fs/promises";
 import type { Feature } from "@automaker/types";
+import { createLogger } from "@automaker/utils";
 import {
   getFeaturesDir,
   getFeatureDir,
   getFeatureImagesDir,
   ensureAutomakerDir,
 } from "@automaker/platform";
+
+const logger = createLogger("FeatureLoader");
 
 // Re-export Feature type for convenience
 export type { Feature };
@@ -57,10 +60,10 @@ export class FeatureLoader {
         try {
           // Paths are now absolute
           await fs.unlink(oldPath);
-          console.log(`[FeatureLoader] Deleted orphaned image: ${oldPath}`);
+          logger.info(`Deleted orphaned image: ${oldPath}`);
         } catch (error) {
           // Ignore errors when deleting (file may already be gone)
-          console.warn(
+          logger.warn(
             `[FeatureLoader] Failed to delete image: ${oldPath}`,
             error
           );
@@ -109,7 +112,7 @@ export class FeatureLoader {
         try {
           await fs.access(fullOriginalPath);
         } catch {
-          console.warn(
+          logger.warn(
             `[FeatureLoader] Image not found, skipping: ${fullOriginalPath}`
           );
           continue;
@@ -121,7 +124,7 @@ export class FeatureLoader {
 
         // Copy the file
         await fs.copyFile(fullOriginalPath, newPath);
-        console.log(
+        logger.info(
           `[FeatureLoader] Copied image: ${originalPath} -> ${newPath}`
         );
 
@@ -139,7 +142,7 @@ export class FeatureLoader {
           updatedPaths.push({ ...imagePath, path: newPath });
         }
       } catch (error) {
-        console.error(`[FeatureLoader] Failed to migrate image:`, error);
+        logger.error(`Failed to migrate image:`, error);
         // Keep original path if migration fails
         updatedPaths.push(imagePath);
       }
@@ -205,7 +208,7 @@ export class FeatureLoader {
           const feature = JSON.parse(content);
 
           if (!feature.id) {
-            console.warn(
+            logger.warn(
               `[FeatureLoader] Feature ${featureId} missing required 'id' field, skipping`
             );
             continue;
@@ -216,11 +219,11 @@ export class FeatureLoader {
           if ((error as NodeJS.ErrnoException).code === "ENOENT") {
             continue;
           } else if (error instanceof SyntaxError) {
-            console.warn(
+            logger.warn(
               `[FeatureLoader] Failed to parse feature.json for ${featureId}: ${error.message}`
             );
           } else {
-            console.error(
+            logger.error(
               `[FeatureLoader] Failed to load feature ${featureId}:`,
               (error as Error).message
             );
@@ -237,7 +240,7 @@ export class FeatureLoader {
 
       return features;
     } catch (error) {
-      console.error("[FeatureLoader] Failed to get all features:", error);
+      logger.error("Failed to get all features:", error);
       return [];
     }
   }
@@ -254,7 +257,7 @@ export class FeatureLoader {
       if ((error as NodeJS.ErrnoException).code === "ENOENT") {
         return null;
       }
-      console.error(
+      logger.error(
         `[FeatureLoader] Failed to get feature ${featureId}:`,
         error
       );
@@ -302,7 +305,7 @@ export class FeatureLoader {
       "utf-8"
     );
 
-    console.log(`[FeatureLoader] Created feature ${featureId}`);
+    logger.info(`Created feature ${featureId}`);
     return feature;
   }
 
@@ -354,7 +357,7 @@ export class FeatureLoader {
       "utf-8"
     );
 
-    console.log(`[FeatureLoader] Updated feature ${featureId}`);
+    logger.info(`Updated feature ${featureId}`);
     return updatedFeature;
   }
 
@@ -365,10 +368,10 @@ export class FeatureLoader {
     try {
       const featureDir = this.getFeatureDir(projectPath, featureId);
       await fs.rm(featureDir, { recursive: true, force: true });
-      console.log(`[FeatureLoader] Deleted feature ${featureId}`);
+      logger.info(`Deleted feature ${featureId}`);
       return true;
     } catch (error) {
-      console.error(
+      logger.error(
         `[FeatureLoader] Failed to delete feature ${featureId}:`,
         error
       );
@@ -391,7 +394,7 @@ export class FeatureLoader {
       if ((error as NodeJS.ErrnoException).code === "ENOENT") {
         return null;
       }
-      console.error(
+      logger.error(
         `[FeatureLoader] Failed to get agent output for ${featureId}:`,
         error
       );
