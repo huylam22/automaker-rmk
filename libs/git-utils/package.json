@@ -1,6 +1,7 @@
 {
   "name": "@automaker/git-utils",
   "version": "1.0.0",
+  "type": "module",
   "description": "Git operations utilities for AutoMaker",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

@@ -10,7 +10,7 @@ export {
   isAuthenticationError,
   classifyError,
   getUserFriendlyErrorMessage,
-} from './error-handler';
+} from './error-handler.js';
 
 // Conversation utilities
 export {
@@ -18,7 +18,7 @@ export {
   normalizeContentBlocks,
   formatHistoryAsText,
   convertHistoryToMessages,
-} from './conversation-utils';
+} from './conversation-utils.js';
 
 // Image handling
 export {
@@ -26,14 +26,14 @@ export {
   readImageAsBase64,
   convertImagesToContentBlocks,
   formatImagePathsForPrompt,
-} from './image-handler';
+} from './image-handler.js';
 
 // Prompt building
 export {
   buildPromptWithImages,
   type PromptContent,
   type PromptWithImages,
-} from './prompt-builder';
+} from './prompt-builder.js';
 
 // Logger
 export {
@@ -41,10 +41,10 @@ export {
   getLogLevel,
   setLogLevel,
   LogLevel,
-} from './logger';
+} from './logger.js';
 
 // File system utilities
 export {
   mkdirSafe,
   existsSafe,
-} from './fs-utils';
+} from './fs-utils.js';

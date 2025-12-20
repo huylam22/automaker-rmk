@@ -20,7 +20,7 @@ export {
   getCredentialsPath,
   getProjectSettingsPath,
   ensureDataDir,
-} from './paths';
+} from './paths.js';
 
 // Subprocess management
 export {
@@ -28,7 +28,7 @@ export {
   spawnProcess,
   type SubprocessOptions,
   type SubprocessResult,
-} from './subprocess';
+} from './subprocess.js';
 
 // Security
 export {
@@ -37,4 +37,4 @@ export {
   isPathAllowed,
   validatePath,
   getAllowedPaths,
-} from './security';
+} from './security.js';

@@ -8,4 +8,4 @@ export {
   areDependenciesSatisfied,
   getBlockingDependencies,
   type DependencyResolutionResult,
-} from './resolver';
+} from './resolver.js';

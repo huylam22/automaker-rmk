@@ -10,4 +10,4 @@ export { CLAUDE_MODEL_MAP, DEFAULT_MODELS, type ModelAlias } from '@automaker/ty
 export {
   resolveModelString,
   getEffectiveModel,
-} from './resolver';
+} from './resolver.js';

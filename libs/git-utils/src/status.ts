@@ -4,7 +4,7 @@
 
 import { exec } from "child_process";
 import { promisify } from "util";
-import { GIT_STATUS_MAP, type FileStatus } from './types';
+import { GIT_STATUS_MAP, type FileStatus } from './types.js';
 
 const execAsync = promisify(exec);
 

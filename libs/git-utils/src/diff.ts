@@ -7,8 +7,8 @@ import fs from "fs/promises";
 import path from "path";
 import { exec } from "child_process";
 import { promisify } from "util";
-import { BINARY_EXTENSIONS, type FileStatus } from './types';
-import { isGitRepo, parseGitStatus } from './status';
+import { BINARY_EXTENSIONS, type FileStatus } from './types.js';
+import { isGitRepo, parseGitStatus } from './status.js';
 
 const execAsync = promisify(exec);
 const logger = createLogger("GitUtils");

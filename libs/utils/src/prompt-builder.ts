@@ -8,7 +8,7 @@
  * - Supports both vision and non-vision models
  */
 
-import { convertImagesToContentBlocks, formatImagePathsForPrompt } from "./image-handler";
+import { convertImagesToContentBlocks, formatImagePathsForPrompt } from "./image-handler.js";
 
 /**
  * Content that can be either simple text or structured blocks

@@ -8,13 +8,13 @@ export {
   BINARY_EXTENSIONS,
   GIT_STATUS_MAP,
   type FileStatus,
-} from './types';
+} from './types.js';
 
 // Export status utilities
 export {
   isGitRepo,
   parseGitStatus,
-} from './status';
+} from './status.js';
 
 // Export diff utilities
 export {
@@ -23,4 +23,4 @@ export {
   listAllFilesInDirectory,
   generateDiffsForNonGitDirectory,
   getGitRepositoryDiffs,
-} from './diff';
+} from './diff.js';

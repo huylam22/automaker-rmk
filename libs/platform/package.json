@@ -1,6 +1,7 @@
 {
   "name": "@automaker/platform",
   "version": "1.0.0",
+  "type": "module",
   "description": "Platform-specific utilities for AutoMaker",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
